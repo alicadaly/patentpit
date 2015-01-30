@@ -1,0 +1,88 @@
+body {
+	font-family: Courier, monospace;
+	font-size: 100%;
+	color: black;
+	background-color: white;
+	margin: 0em;
+	padding: 3em;
+}
+
+input {
+	font-family: Courier, monospace;
+	font-size: 125%;
+	color: black;
+	text-transform: uppercase;
+	background-color: white;
+	border: 1px solid black;
+	margin: 0em;
+	padding: 5px;
+	width: 790px;
+}
+
+div {
+	padding: 0px;
+	margin: 0;
+/* 	border: 1px solid black; */
+	border: none;
+}
+
+form {
+	padding: 0em;
+	margin: 0em;
+}
+
+em {
+	background-color: yellow;
+	font-style: normal;
+	font-weight: normal;
+}
+
+#wrapper {
+}
+
+#results {
+    height: auto;
+}
+
+.url {
+    padding: 5px;
+    padding-bottom: 0px;
+}
+
+.stats {
+    padding: 5px;
+    padding-top: 0px;
+}
+
+#docs {
+    margin-top: 15px;
+    margin-bottom: 5px;
+	width: auto;
+/*     border: 1px solid green; */
+}
+
+.doc {
+    padding: 5px;
+/*     border: 1px solid yellow; */
+}
+
+#aggs {
+    margin-top: 15px;
+    margin-bottom: 5px;
+	width: auto;
+/*     border: 1px solid green; */
+}
+
+.agg {
+    padding: 5px;
+/*     border: 1px solid yellow; */
+}
+
+.title {
+}
+
+.detail {
+    color: grey;
+    font-size: 85%;
+/*     border: 1px solid red; */
+}
