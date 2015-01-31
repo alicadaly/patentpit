@@ -2,6 +2,8 @@ function request(event) {
 
 	var update_docs = function (response) {
 
+        request_docs = null;
+
 		$("#docs").empty();
 		$("#docs").append($("<div class='url'></div>").text(response['url']));
 		$("#docs").append($("<div class='stats'></div>").text(response['count'] + " [" + response['time_search_ms'] + "/" + response['time_server_ms'] + "/" + (new Date().getTime() - t1)  + "ms]"));
@@ -28,6 +30,8 @@ function request(event) {
 
     var update_aggs = function (response) {
 
+        request_aggs = null;
+
 		$("#aggs").empty();
 		$("#aggs").append($("<div class='url'></div>").text(response['url']));
 		$("#aggs").append($("<div class='stats'></div>").text(response['count'] + " [" + response['time_search_ms'] + "/" + response['time_server_ms'] + "/" + (new Date().getTime() - t1)  + "ms]"));
@@ -50,11 +54,15 @@ function request(event) {
 	var t1 = new Date().getTime()
 
     // abort previous request
-    if (request_docs) {
+    if (request_docs != null) {
+//         console.log("aborting docs request");
         request_docs.abort();
+        request_docs = null;
     }
-    if (request_aggs) {
+    if (request_aggs != null) {
+//         console.log("aborting aggs request");
         request_aggs.abort();
+        request_aggs = null;
     }
 
 	var terms = $(this).val().trim().replace(SPACES, " ").split(" ").join(",").toLowerCase();
@@ -64,11 +72,14 @@ function request(event) {
         return s.replace(re, "<em>$1</em>");
     }
 
+//     console.log("doing docs request");
 	request_docs = $.ajax({
 		url: BASE + "/api/transfers/docs/" + terms,
 		type: "GET",
 		dataType : "json",
 		success: function (response) {
+//             console.log("doing docs update...");
+//             console.log(response)
 			update_docs(response);
 		},
 		error: function (response) {
@@ -77,11 +88,14 @@ function request(event) {
 		}
 	});
 
+//     console.log("doing aggs request");
 	request_aggs = $.ajax({
 		url: BASE + "/api/transfers/aggs/" + terms,
 		type: "GET",
 		dataType : "json",
 		success: function (response) {
+//             console.log("doing aggs update...");
+//             console.log(response)
 			update_aggs(response);
 		},
 		error: function (response) {
@@ -107,6 +121,6 @@ var request_aggs = null;
 
 $( document ).ready(function() {
 	$("#searchbox").on("keyup", request);
-	$("#searchform").on("keydown", ignore);
+	$("#searchform").on("submit", request);
 });
 
