@@ -65,7 +65,7 @@ function request(event) {
     }
 
 	request_docs = $.ajax({
-		url: "http://localhost:9000/api/transfers/docs/" + terms,
+		url: BASE + "/api/transfers/docs/" + terms,
 		type: "GET",
 		dataType : "json",
 		success: function (response) {
@@ -78,7 +78,7 @@ function request(event) {
 	});
 
 	request_aggs = $.ajax({
-		url: "http://localhost:9000/api/transfers/aggs/" + terms,
+		url: BASE + "/api/transfers/aggs/" + terms,
 		type: "GET",
 		dataType : "json",
 		success: function (response) {
@@ -100,7 +100,8 @@ function ignore(event) {
 
 const MAX_RESULTS = 5;
 
-var SPACES = new RegExp(" +", "g")
+var BASE = "http://" + (document.domain || "localhost:9000");
+var SPACES = new RegExp(" +", "g");
 var request_docs = null;
 var request_aggs = null;
 
