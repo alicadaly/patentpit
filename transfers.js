@@ -12,7 +12,7 @@ function request(event) {
 			if (idx > MAX_RESULTS) return;
 			var s = "<div class='doc'>" +
 					"<div class='title'>" + val['title'] + "</div>" +
-					"<div class='detail'>" + val['date_recorded'] + " (" + _names(val['assignors']) + ") > (" + _names(val['assignees']) + ")</div>" +
+					"<div class='detail'>" + val['date_recorded'] + " " + _names(val['assignors']) + " > " + _names(val['assignees']) + " (" + val['correspondent'] + ")</div>" +
 					"<div class='detail'>APP ID: " + val['id_app']['number'] + " PAT NO: " + val['id_pat']['number'] + " PUB NO: " + val['id_pub']['number'] + " DOC: " + val['uuid'] + "</div>" +
 					"</div>"
 			$("#docs").append(_hl(s));
@@ -112,7 +112,7 @@ function ignore(event) {
 	}
 }
 
-const MAX_RESULTS = 5;
+const MAX_RESULTS = 25;
 
 var BASE = "http://" + (document.domain || "localhost:9000");
 var SPACES = new RegExp(" +", "g");
