@@ -66,7 +66,8 @@ function request(event) {
     }
 
 	var terms = $(this).val().replace(SPACES, " ").trim().split(" ").join(",").toLowerCase();
-	var re = new RegExp("(" + terms.toUpperCase().split(",").join("|") + ")", "g")
+	var re = new RegExp("(\\b" + terms.toUpperCase().split(",").join("|\\b") + ")", "g")
+	console.log(re)
 
     function _hl(s) {
         return s.replace(re, "<em>$1</em>");
