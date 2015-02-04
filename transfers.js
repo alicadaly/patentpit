@@ -65,7 +65,7 @@ function request(event) {
         request_aggs = null;
     }
 
-	var terms = $(this).val().trim().replace(SPACES, " ").split(" ").join(",").toLowerCase();
+	var terms = $(this).val().replace(SPACES, " ").trim().split(" ").join(",").toLowerCase();
 	var re = new RegExp("(" + terms.toUpperCase().split(",").join("|") + ")", "g")
 
     function _hl(s) {
@@ -74,7 +74,7 @@ function request(event) {
 
 //     console.log("doing docs request");
 	request_docs = $.ajax({
-		url: BASE + "/api/transfers/docs/" + terms,
+		url: BASE + "/api/transfers/docs?terms=" + terms,
 		type: "GET",
 		dataType : "json",
 		success: function (response) {
@@ -90,7 +90,7 @@ function request(event) {
 
 //     console.log("doing aggs request");
 	request_aggs = $.ajax({
-		url: BASE + "/api/transfers/aggs/" + terms,
+		url: BASE + "/api/transfers/aggs?terms=" + terms,
 		type: "GET",
 		dataType : "json",
 		success: function (response) {
@@ -114,8 +114,8 @@ function ignore(event) {
 
 const MAX_RESULTS = 25;
 
-var BASE = "http://" + (document.domain || "localhost:9000");
-var SPACES = new RegExp(" +", "g");
+var BASE = "http://" + (document.domain || "localhost:8080");
+var SPACES = new RegExp("[^A-Za-z0-9_\-]+", "g");
 var request_docs = null;
 var request_aggs = null;
 
