@@ -39,7 +39,7 @@ function request(event) {
         function _agg(key) {
             var agg = $("<div class='agg'></div>").append("<div class='title'>" + key.toUpperCase() + "</div>");
             $.each(response['data'][key], function(idx, val) {
-                agg.append("<div class='detail'>" + val['key'] + " : " + val['doc_count'] + "</div>");
+                agg.append("<div class='detail'>" + _hl(val['key']) + " : " + val['doc_count'] + "</div>");
             });
             return agg;
 	    }
@@ -47,6 +47,7 @@ function request(event) {
         if (response.count > 0) {
             $("#aggs").append(_agg("assignors"));
             $("#aggs").append(_agg("assignees"));
+            $("#aggs").append(_agg("volumes"));
         }
 
 	}
@@ -73,14 +74,11 @@ function request(event) {
         return s.replace(re, "<em>$1</em>");
     }
 
-//     console.log("doing docs request");
 	request_docs = $.ajax({
 		url: BASE + "/api/transfers/docs?terms=" + terms,
 		type: "GET",
 		dataType : "json",
 		success: function (response) {
-//             console.log("doing docs update...");
-//             console.log(response)
 			update_docs(response);
 		},
 		error: function (response) {
@@ -89,14 +87,11 @@ function request(event) {
 		}
 	});
 
-//     console.log("doing aggs request");
 	request_aggs = $.ajax({
 		url: BASE + "/api/transfers/aggs?terms=" + terms,
 		type: "GET",
 		dataType : "json",
 		success: function (response) {
-//             console.log("doing aggs update...");
-//             console.log(response)
 			update_aggs(response);
 		},
 		error: function (response) {
