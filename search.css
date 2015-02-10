@@ -37,6 +37,11 @@ em {
 	font-weight: normal;
 }
 
+#about {
+    margin-left: 5px;
+    margin-bottom: 5px;
+}
+
 #wrapper {
 }
 

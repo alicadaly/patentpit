@@ -110,7 +110,8 @@ function ignore(event) {
 
 const MAX_RESULTS = 25;
 
-var BASE = "http://" + (document.domain || "localhost:8080");
+// var BASE = "http://" + (document.domain || "localhost:8080");
+var BASE = "http://patentpit.com";
 var SPACES = new RegExp("[^A-Za-z0-9_\-]+", "g");
 var request_docs = null;
 var request_aggs = null;
