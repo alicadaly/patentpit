@@ -10,10 +10,14 @@ function request(event) {
 
 		$.each(response['data'], function(idx, val) {
 			if (idx > MAX_RESULTS) return;
+			var pat_no = val['id_pat']['number']
+			if (pat_no != null) {
+			    pat_no = "<a href='https://www.google.com/patents/US" + pat_no + "'>" + pat_no + "</a>"
+			}
 			var s = "<div class='doc'>" +
 					"<div class='title'>" + val['title'] + "</div>" +
 					"<div class='detail'>" + val['date_recorded'] + " " + _names(val['assignors']) + " > " + _names(val['assignees']) + " (" + val['correspondent'] + ")</div>" +
-					"<div class='detail'>APP ID: " + val['id_app']['number'] + " PAT NO: " + val['id_pat']['number'] + " PUB NO: " + val['id_pub']['number'] + " DOC: " + val['uuid'] + "</div>" +
+					"<div class='detail'>APP ID: " + val['id_app']['number'] + " PAT NO: " + pat_no + " PUB NO: " + val['id_pub']['number'] + " DOC: " + val['uuid'] + "</div>" +
 					"</div>"
 			$("#docs").append(_hl(s));
 		});
