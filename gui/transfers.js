@@ -60,23 +60,31 @@ function request(event) {
 
     // abort previous request
     if (request_docs != null) {
-//         console.log("aborting docs request");
         request_docs.abort();
         request_docs = null;
     }
     if (request_aggs != null) {
-//         console.log("aborting aggs request");
         request_aggs.abort();
         request_aggs = null;
     }
 
-	var terms = $(this).val().replace(SPACES, " ").trim().split(" ").join(",").toLowerCase();
-	var re = new RegExp("(" + terms.toUpperCase().split(",").map(function(s){ return "\\b" + s; }).join("|") + ")", "g")
-// 	console.log(re)
+	var terms = $("#searchbox").val()
+		.replace(SPACES, " ")
+		.trim()
+		.split(" ")
+		.join(",")
+		.toLowerCase();
     document.location.hash = terms
 
+	var matches = terms
+		.toUpperCase()
+		.split(",")
+		.map(function(s){ return "\\b" + s; })
+		.join("|");
+	var hl_re = new RegExp("(" + matches + ")", "g");
+
     function _hl(s) {
-        return s.replace(re, "<em>$1</em>");
+        return s.replace(hl_re, "<em>$1</em>");
     }
 
 	request_docs = $.ajax({
@@ -87,7 +95,7 @@ function request(event) {
 			update_docs(response);
 		},
 		error: function (response) {
-			console.log(response.statusText);
+// 			console.log(response.statusText);
 			$("#docs").empty();
 		}
 	});
@@ -100,7 +108,7 @@ function request(event) {
 			update_aggs(response);
 		},
 		error: function (response) {
-			console.log(response.statusText);
+// 			console.log(response.statusText);
 			$("#aggs").empty();
 		}
 	});
@@ -122,6 +130,17 @@ var request_docs = null;
 var request_aggs = null;
 
 $( document ).ready(function() {
+
+	var h = document.location.hash
+		.replace(SPACES, " ")
+		.trim()
+		.toUpperCase();
+
+	if (h != "") {
+		$("#searchbox").val(h)
+		request(null);
+	}
+
 	$("#searchbox").on("keyup", request);
 	$("#searchform").on("submit", request);
 });
