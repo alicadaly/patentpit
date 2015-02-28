@@ -72,7 +72,8 @@ function request(event) {
 
 	var terms = $(this).val().replace(SPACES, " ").trim().split(" ").join(",").toLowerCase();
 	var re = new RegExp("(" + terms.toUpperCase().split(",").map(function(s){ return "\\b" + s; }).join("|") + ")", "g")
-	console.log(re)
+// 	console.log(re)
+    document.location.hash = terms
 
     function _hl(s) {
         return s.replace(re, "<em>$1</em>");
