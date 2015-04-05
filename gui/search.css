@@ -37,6 +37,19 @@ em {
 	font-weight: normal;
 }
 
+a {
+	background-color: orange;
+	text-decoration: none;
+	font-style: normal;
+	font-weight: normal;
+	color: black;
+	background-color: white;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
 #about {
     margin-left: 5px;
     margin-bottom: 5px;
@@ -56,7 +69,8 @@ em {
 
 .stats {
     padding: 5px;
-    padding-top: 0px;
+    padding-top: 2px;
+    padding-bottom: 10px;
 }
 
 #docs {
@@ -89,5 +103,6 @@ em {
 .detail {
     color: grey;
     font-size: 85%;
+    white-space: pre;
 /*     border: 1px solid red; */
 }
