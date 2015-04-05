@@ -43,7 +43,8 @@ a {
 	font-style: normal;
 	font-weight: normal;
 	color: black;
-	background-color: white;
+	background-color: PaleGoldenRod;
+/* 	background-color: #EEE8AA; */
 }
 
 a:hover {

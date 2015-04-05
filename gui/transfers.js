@@ -5,14 +5,15 @@ function request(event) {
         request_docs = null;
 
 		$("#docs").empty();
-		$("#docs").append($("<div class='url'></div>").text("API URL: " + response['url']));
-		$("#docs").append($("<div class='stats'></div>").text("RESULTS: " + response['count'] + " | SEARCH TIME: " + response['time_search_ms'] + "ms | TOTAL REQUEST TIME: " + (new Date().getTime() - t1) + "ms"  ));
+		$("#docs").append("<div class='url'>API URL: " + response['url'] + "</div>");
+		$("#docs").append("<div class='stats'>RESULTS: " + response['count'] + " SEARCH TIME: " + response['time_search_ms'] + "ms TOTAL REQUEST TIME: " + (new Date().getTime() - t1) + "ms</div>");
 
 		$.each(response['data'], function(idx, r) {
 			if (idx > MAX_RESULTS) return;
 			var s = "<div class='doc'>" +
 					"<div class='title'>" + r['patent']['titles'][0] + "</div>" +
-					"<div class='detail'>FROM: " + _date(r['owner']['date_from']) + " | UNTIL: " + _date(r['owner']['date_to']) + " | OWNER/S: " + _names(r) + " | " + _ids(r) + " </div>"
+					"<div class='detail'>FROM: " + _date(r['owner']['date_from']) + " UNTIL: " + _date(r['owner']['date_to']) + " " + _ids(r) + " </div>" +
+					"<div class='detail'>OWNERS: " + _names(r) + "</div>";
 			$("#docs").append(_hl(s));
 		});
 
