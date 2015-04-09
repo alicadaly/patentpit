@@ -1,134 +1,127 @@
-function request(event) {
+function process(event) {
 
-	var update_docs = function (response) {
+	function update(response) {
 
-        request_docs = null;
+        request = null;
+
+		$("#stats").empty();
+		$("#stats").append("<div class='url'>API URL: " + response['url'] + "</div>");
+		$("#stats").append("<div class='stats'>RESULTS: " + response['count'] + " SEARCH TIME: " + response['time_search_ms'] + "ms TOTAL REQUEST TIME: " + (new Date().getTime() - t1) + "ms</div>");
 
 		$("#docs").empty();
-		$("#docs").append("<div class='url'>API URL: " + response['url'] + "</div>");
-		$("#docs").append("<div class='stats'>RESULTS: " + response['count'] + " SEARCH TIME: " + response['time_search_ms'] + "ms TOTAL REQUEST TIME: " + (new Date().getTime() - t1) + "ms</div>");
 
 		$.each(response['data'], function(idx, r) {
-			if (idx > MAX_RESULTS) return;
 			var s = "<div class='doc'>" +
 					"<div class='title'>" + r['patent']['titles'][0] + "</div>" +
 					"<div class='detail'>FROM: " + _date(r['owner']['date_from']) + " UNTIL: " + _date(r['owner']['date_to']) + " " + _ids(r) + " </div>" +
 					"<div class='detail'>OWNERS: " + _names(r) + "</div>";
-			$("#docs").append(_hl(s));
+			$("#docs").append(_highlight(s));
 		});
 
-        function _date(d) {
-            if ((d === "1970-01-01") || (d === "2100-01-01")) {
-//                 d = "          ";
-                d = "unknown   ";
-            }
-            return d;
-        }
-
-		function _names(record) {
-			var names = [];
-			$.each(record['owner']['name'], function(idx, n) {
-				names.push(n);
-			});
-			return names.join("; ");
-		}
-
-        function _ids(record) {
-            var ids = [];
-            $.each(record['patent']['ids'], function(idx, i) {
-                if ((i['type'] == 'PUB') || (i['type'] == 'PAT')) {
-                    ids.push(i['type'] + ":&nbsp;<a href='https://www.google.com/patents/US" + i['number'] + "'>" + i['number'] + "</a>");
-                }
-                else {
-                    ids.push(i['type'] + ":&nbsp;" + i['number']);
-                }
-            });
-            return ids.join(" ");
-        }
-
 	}
-
-//     var update_aggs = function (response) {
-//
-//         request_aggs = null;
-//
-// 		$("#aggs").empty();
-// 		$("#aggs").append($("<div class='url'></div>").text(response['url']));
-// 		$("#aggs").append($("<div class='stats'></div>").text(response['count'] + " [" + response['time_search_ms'] + "/" + response['time_server_ms'] + "/" + (new Date().getTime() - t1)  + "ms]"));
-//
-//         function _agg(key) {
-//             var agg = $("<div class='agg'></div>").append("<div class='title'>" + key.toUpperCase() + "</div>");
-//             $.each(response['data'][key], function(idx, val) {
-//                 agg.append("<div class='detail'>" + _hl(val['key']) + " : " + val['doc_count'] + "</div>");
-//             });
-//             return agg;
-// 	    }
-//
-//         if (response.count > 0) {
-//             $("#aggs").append(_agg("assignors"));
-//             $("#aggs").append(_agg("assignees"));
-//             $("#aggs").append(_agg("volumes"));
-//         }
-//
-// 	}
 
 	var t1 = new Date().getTime()
 
     // abort previous request
-    if (request_docs != null) {
-        request_docs.abort();
-        request_docs = null;
-    }
-//     if (request_aggs != null) {
-//         request_aggs.abort();
-//         request_aggs = null;
-//     }
-
-	var terms = $("#searchbox").val()
-		.replace(SPACES, " ")
-		.trim()
-		.split(" ")
-		.join(",")
-		.toLowerCase();
-    document.location.hash = terms
-
-	var matches = terms
-		.toUpperCase()
-		.split(",")
-		.map(function(s){ return "\\b" + s; })
-		.join("|");
-	var hl_re = new RegExp("(" + matches + ")", "g");
-
-    function _hl(s) {
-        return s.replace(hl_re, "<em>$1</em>");
+    if (request != null) {
+        request.abort();
+        request = null;
     }
 
-	request_docs = $.ajax({
-		url: BASE + "/api/owners/docs?terms=" + terms,
+    var params = {
+        "title": _clean($("#search_title").val()),
+        "owners": _clean($("#search_owners").val()),
+        "dates": _clean($("#search_dates").val()),
+    };
+//     query = $.param(params);
+    query = _encode(params);
+    document.location.hash = query;
+
+    // this is for highlighting
+    var terms = [];
+    terms = terms.concat(_clean($("#search_title").val()).split(","));
+    terms = terms.concat(_clean($("#search_owners").val()).split(","));
+    terms = terms.concat(_clean($("#search_dates").val()).split(","));
+    terms = terms.filter(function(e){return e}); // remove empties
+    console.log(terms);
+	var matches = terms.map(function(s){ return "\\b" + s.toUpperCase(); }).join("|");
+	console.log(matches);
+	var highlightRegex = new RegExp("(" + matches + ")", "g");
+	console.log(highlightRegex);
+    function _highlight(s) {
+        return s.replace(highlightRegex, "<em>$1</em>");
+    }
+
+	request = $.ajax({
+		url: BASE + "/api/owners/docs?" + query,
 		type: "GET",
 		dataType : "json",
-		success: function (response) {
-			update_docs(response);
-		},
+		success: update,
 		error: function (response) {
 // 			console.log(response.statusText);
+			$("#stats").empty();
 			$("#docs").empty();
 		}
 	});
 
-// 	request_aggs = $.ajax({
-// 		url: BASE + "/api/transfers/aggs?terms=" + terms,
-// 		type: "GET",
-// 		dataType : "json",
-// 		success: function (response) {
-// 			update_aggs(response);
-// 		},
-// 		error: function (response) {
-// // 			console.log(response.statusText);
-// 			$("#aggs").empty();
-// 		}
-// 	});
+}
 
+function _date(d) {
+    if ((d === "1970-01-01") || (d === "2100-01-01")) {
+        d = "unknown   ";
+    }
+    return d;
+}
+
+function _names(record) {
+    var names = [];
+    $.each(record['owner']['names'], function(idx, n) {
+        names.push(n);
+    });
+    return names.join("; ");
+}
+
+function _ids(record) {
+    var ids = [];
+    $.each(record['patent']['ids'], function(idx, i) {
+        if ((i['type'] == 'PUB') || (i['type'] == 'PAT')) {
+            ids.push(i['type'] + ":&nbsp;<a href='https://www.google.com/patents/US" + i['number'] + "'>" + i['number'] + "</a>");
+        }
+        else {
+            ids.push(i['type'] + ":&nbsp;" + i['number']);
+        }
+    });
+    return ids.join(" ");
+}
+
+SPACES = new RegExp("[^A-Za-z0-9_\-]+", "g");
+function _clean(s) {
+    s = s
+        .replace(SPACES, " ")
+        .trim()
+        .split(" ")
+        .join(",")
+        .toLowerCase();
+    return s;
+}
+
+function _encode(p) {
+    var s = "";
+    $.each(p, function(k, v) {
+        s += k + "=" + v + "&";
+    });
+    return s.slice(0,-1)
+}
+
+function _decode(s) {
+    var params = {}
+    $.each(s.split("&"), function(_, v) {
+        kv = v.split("=");
+        if (kv[0] != "") {
+            params[kv[0]] = kv[1];
+        }
+    });
+    return params
 }
 
 function ignore(event) {
@@ -137,27 +130,12 @@ function ignore(event) {
 	}
 }
 
-const MAX_RESULTS = 25;
-
 var BASE = "http://" + (document.domain || "localhost:8080");
 // var BASE = "http://patentpit.com";
-var SPACES = new RegExp("[^A-Za-z0-9_\-]+", "g");
-var request_docs = null;
-// var request_aggs = null;
+var request = null;
 
 $( document ).ready(function() {
-
-	var h = document.location.hash
-		.replace(SPACES, " ")
-		.trim()
-		.toUpperCase();
-
-	if (h != "") {
-		$("#searchbox").val(h)
-		request(null);
-	}
-
-	$("#searchbox").on("keyup", request);
-	$("#searchform").on("submit", request);
+	$("#searchform").on("keyup", process);
+	$("#searchform").on("submit", process);
 });
 

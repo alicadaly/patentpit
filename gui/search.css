@@ -9,20 +9,32 @@ body {
 
 input {
 	font-family: Courier, monospace;
-	font-size: 125%;
+	font-size: 100%;
 	color: black;
 	text-transform: uppercase;
 	background-color: white;
 	border: 1px solid black;
 	margin: 0em;
-	padding: 5px;
-	width: 790px;
+	margin-bottom: 10px;
+	padding: 10px;
+	width: 20em;
+	display: block;
+}
+
+label {
+    padding-left: 10px;
+}
+
+.search {
+    display: inline;
+    float: left;
+    margin: 5px;
 }
 
 div {
 	padding: 0px;
 	margin: 0;
-/* 	border: 1px solid black; */
+	border: 1px solid black;
 	border: none;
 }
 
@@ -75,7 +87,7 @@ a:hover {
 }
 
 #docs {
-    margin-top: 15px;
+    margin-top: 5px;
     margin-bottom: 5px;
 	width: auto;
 /*     border: 1px solid green; */
@@ -83,6 +95,7 @@ a:hover {
 
 .doc {
     padding: 5px;
+    padding-top: 0px;
 /*     border: 1px solid yellow; */
 }
 
@@ -104,6 +117,6 @@ a:hover {
 .detail {
     color: grey;
     font-size: 85%;
-    white-space: pre;
+/*     white-space: pre; */
 /*     border: 1px solid red; */
 }
