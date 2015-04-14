@@ -135,7 +135,16 @@ var BASE = "http://" + (document.domain || "localhost:8080");
 var request = null;
 
 $( document ).ready(function() {
+
+    var params = _decode(document.location.hash.slice(1).replace(",", " "));
+    $("#search_title").val(params['title'])
+    $("#search_owners").val(params['owners'])
+    $("#search_dates").val(params['dates'])
+
 	$("#searchform").on("keyup", process);
 	$("#searchform").on("submit", process);
+
+	process();
+
 });
 
