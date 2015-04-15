@@ -1,39 +1,66 @@
 function process(event) {
 
-	function update(response) {
+	function updateDocs(response) {
 
-        request = null;
+        docsRequest = null;
 
-		$("#stats").empty();
-		$("#stats").append("<div class='url'>API URL: " + response['url'] + "</div>");
-		$("#stats").append("<div class='stats'>RESULTS: " + response['count'] + " SEARCH TIME: " + response['time_search_ms'] + "ms TOTAL REQUEST TIME: " + (new Date().getTime() - t1) + "ms</div>");
+		$("#docs .stats").empty();
+		$("#docs .stats").append("<div>API URL: " + response['url'] + "</div>");
+		$("#docs .stats").append("<div>RESULTS: " + response['count'] + " SEARCH TIME: " + response['time_search_ms'] + "ms TOTAL REQUEST TIME: " + (new Date().getTime() - t1) + "ms</div>");
 
-		$("#docs").empty();
+		$("#docs .data").empty();
 
 		$.each(response['data'], function(idx, r) {
-			var s = "<div class='doc'>" +
+			var s = "<div class='item'>" +
 					"<div class='title'>" + r['patent']['titles'][0] + "</div>" +
 					"<div class='detail'>FROM: " + _date(r['owner']['date_from']) + " UNTIL: " + _date(r['owner']['date_to']) + " " + _ids(r) + " </div>" +
 					"<div class='detail'>OWNERS: " + _names(r) + "</div>";
-			$("#docs").append(_highlight(s));
+			$("#docs .data").append(_highlight(s));
+		});
+
+	}
+
+	function updateAggs(response) {
+
+        aggsRequest = null;
+
+		$("#aggs .stats").empty();
+		$("#aggs .stats").append("<div>API URL: " + response['url'] + "</div>");
+		$("#aggs .stats").append("<div>RESULTS: " + response['count'] + " SEARCH TIME: " + response['time_search_ms'] + "ms TOTAL REQUEST TIME: " + (new Date().getTime() - t1) + "ms</div>");
+
+		$("#aggs .data").empty();
+
+
+		$.each(response['data']['owners'], function(idx, r) {
+			var s = "<div class='title'>" + r['key'] + ": " + r['doc_count'] + "</div>";
+			$("#aggs .data").append(_highlight(s));
 		});
 
 	}
 
 	var t1 = new Date().getTime()
 
-    // abort previous request
-    if (request != null) {
-        request.abort();
-        request = null;
+    if (docsRequest != null) {
+        docsRequest.abort();
+        docsRequest = null;
     }
+
+    if (aggsRequest != null) {
+        aggsRequest.abort();
+        aggsRequest = null;
+    }
+
+    $("#docs .stats").empty().append("processing documents...");
+    $("#docs .data").empty();
+
+    $("#aggs .stats").empty().append("processing aggregations...");
+    $("#aggs .data").empty();
 
     var params = {
         "title": _clean($("#search_title").val()),
         "owners": _clean($("#search_owners").val()),
         "dates": _clean($("#search_dates").val()),
     };
-//     query = $.param(params);
     query = _encode(params);
     document.location.hash = query;
 
@@ -43,24 +70,36 @@ function process(event) {
     terms = terms.concat(_clean($("#search_owners").val()).split(","));
     terms = terms.concat(_clean($("#search_dates").val()).split(","));
     terms = terms.filter(function(e){return e}); // remove empties
-    console.log(terms);
+//     console.log(terms);
 	var matches = terms.map(function(s){ return "\\b" + s.toUpperCase(); }).join("|");
-	console.log(matches);
+// 	console.log(matches);
 	var highlightRegex = new RegExp("(" + matches + ")", "g");
 	console.log(highlightRegex);
     function _highlight(s) {
         return s.replace(highlightRegex, "<em>$1</em>");
     }
 
-	request = $.ajax({
+	docsRequest = $.ajax({
 		url: BASE + "/api/owners/docs?" + query,
 		type: "GET",
 		dataType : "json",
-		success: update,
+		success: updateDocs,
 		error: function (response) {
 // 			console.log(response.statusText);
-			$("#stats").empty();
-			$("#docs").empty();
+			$("#docs .stats").empty();
+			$("#docs .data").empty();
+		}
+	});
+
+	aggsRequest = $.ajax({
+		url: BASE + "/api/owners/aggs?" + query,
+		type: "GET",
+		dataType : "json",
+		success: updateAggs,
+		error: function (response) {
+// 			console.log(response.statusText);
+			$("#aggs .stats").empty();
+			$("#aggs .data").empty();
 		}
 	});
 
@@ -132,7 +171,8 @@ function ignore(event) {
 
 var BASE = "http://" + (document.domain || "localhost:8080");
 // var BASE = "http://patentpit.com";
-var request = null;
+var docsRequest = null;
+var aggsRequest = null;
 
 $( document ).ready(function() {
 
