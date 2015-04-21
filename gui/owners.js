@@ -1,169 +1,130 @@
-function process(event) {
+function updateAgg(id, t1, response) {
 
-	function updateDocs(response) {
+    $(id + " .stats").text("PATENT COUNT: " + response['count'] + " SEARCH TIME: " + response['time_search_ms'] + "ms TOTAL REQUEST TIME: " + (new Date().getTime() - t1) + "ms");
+    $(id + " .title").show()
 
-        docsRequest = null;
+    var data = $(id + " .data");
+    data.empty();
 
-		$("#docs .stats").empty();
-// 		$("#docs .stats").append("<div>API URL: " + response['url'] + "</div>");
-		$("#docs .stats").append("<div>API URL: " + docsUrl + "</div>");
-		$("#docs .stats").append("<div>RESULTS: " + response['count'] + " SEARCH TIME: " + response['time_search_ms'] + "ms TOTAL REQUEST TIME: " + (new Date().getTime() - t1) + "ms</div>");
+    $.each(response['data'], function(idx, r) {
+        var s = "<div class='agg-item'><div class='agg-value'></div><div class='agg-text'>" + r['key'] + ": " + r['doc_count'] + "</div></div>";
+//         data.append(_highlight(s));
+        data.append(s);
+    });
 
-		$("#docs .data").empty();
+    var _d = [];
+    $.each(response['data'], function(idx, r) {
+        _d.push(r['doc_count']);
+    });
+    var _width = d3.scale.linear()
+        .domain([0, d3.max(_d)])
+        .range([0, 985]);
 
-		$.each(response['data'], function(idx, r) {
-			var s = "<div class='item'>" +
-					"<div class='title'>" + r['patent']['titles'][0] + "</div>" +
-// 					"<div class='detail'>FROM: " + _date(r['owner']['date_from']) + " UNTIL: " + _date(r['owner']['date_to']) + " " + _ids(r) + " OWNERS: " + _names(r) + "</div></div>";
-					"<div class='detail'>FROM: " + _date(r['owner']['date_from']) + " UNTIL: " + _date(r['owner']['date_to']) + " " + _ids(r) + " </div>" +
-					"<div class='detail'>OWNERS: " + _names(r) + "</div>";
-			$("#docs .data").append(_highlight(s));
-		});
+    console.log(_d);
 
-// 		d3.selectAll(".item").style("background-color", function(d, i) {
-//             return i % 2 ? "#ddd" : "#eee";
-//         });
+    d3.selectAll(id + " .agg-value")
+        .data(_d)
+        .style("width", function(d) { return _width(d) + "px"; })
 
-	}
+    return;
 
-	function updateAggs(response) {
+}
 
-        aggsRequest = null;
-
-		$("#aggs .stats").empty();
-// 		$("#aggs .stats").append("<div>API URL: " + response['url'] + "</div>");
-		$("#aggs .stats").append("<div>API URL: " + aggsUrl + "</div>");
-		$("#aggs .stats").append("<div>RESULTS: " + response['count'] + " SEARCH TIME: " + response['time_search_ms'] + "ms TOTAL REQUEST TIME: " + (new Date().getTime() - t1) + "ms</div>");
-
-		$("#aggs .data").empty();
-
-
-		$.each(response['data']['owners'], function(idx, r) {
-			var s = "<div class='agg-item'><div class='agg-value'></div><div class='agg-text'>" + r['key'] + ": " + r['doc_count'] + "</div></div>";
-// 			$("#aggs .data").append(_highlight(s));
-			$("#aggs .data").append(s);
-		});
-
-        var _d = [];
-        $.each(response['data']['owners'], function(idx, r) {
-            _d.push(r['doc_count']);
-        });
-        var _width = d3.scale.linear()
-            .domain([0, d3.max(_d)])
-            .range([0, 985]);
-
-        console.log(_d);
-
-		d3.selectAll("#aggs .agg-value")
-            .data(_d)
-//             .style("font-size", function(d) { return d['doc_count'] + "px"; });
-//             .html(function(d) { return d['key'] });
-            .style("width", function(d) { return _width(d) + "px"; })
-//             .style("background-color", "blue");
-
-// 		d3.selectAll("#aggs .title").style("background-color", function(d, i) {
-//             return i % 2 ? "#ddd" : "#eee";
-//         });
-
-	}
-
-	var t1 = new Date().getTime()
-
-    if (docsRequest != null) {
-        docsRequest.abort();
-        docsRequest = null;
+function _abortRequest(r) {
+    if (r != null) {
+        r.abort();
+        r = null;
+        console.log("aborted: " + r);
     }
+}
 
-    if (aggsRequest != null) {
-        aggsRequest.abort();
-        aggsRequest = null;
-    }
-
+function _getQueryString() {
     var params = {
         "title": _clean($("#search_title").val()),
         "owners": _clean($("#search_owners").val()),
         "dates": _clean($("#search_dates").val()),
     };
-    query = _encode(params);
-    document.location.hash = query;
+    var s = _encode(params);
+    return s;
+}
 
-    // this is for highlighting
-    var terms = [];
-    terms = terms.concat(_clean($("#search_title").val()).split(","));
-    terms = terms.concat(_clean($("#search_owners").val()).split(","));
-    terms = terms.concat(_clean($("#search_dates").val()).split(","));
-    terms = terms.filter(function(e){return e}); // remove empties
-	var matches = terms.map(function(s){ return "\\b" + s.toUpperCase(); }).join("|");
-	var highlightRegex = new RegExp("(" + matches + ")", "g");
-	console.log(highlightRegex);
-    function _highlight(s) {
-        return s.replace(highlightRegex, "<em>$1</em>");
-    }
+function _updateAgg(id, url) {
+    $(id + " .url").text("API URL: " + url);
+    $(id + " .stats").text("processing...");
+    $(id + " .data").empty();
+}
 
+function _resetAgg(id) {
+    $(id + " .title").hide();
+    $(id + " .url").empty();
+    $(id + " .stats").empty();
+    $(id + " .data").empty();
+}
 
-    docsUrl = BASE + "/api/owners/docs?" + query;
-    aggsUrl = BASE + "/api/owners/aggs?" + query;
+function process(event) {
 
-    $("#docs .stats").empty().append("<div>API URL: " + docsUrl + "</div><div>processing...</div>");
-    $("#docs .data").empty();
+	var t1 = new Date().getTime()
 
-    $("#aggs .stats").empty().append("<div>API URL: " + aggsUrl + "</div><div>processing...</div>");
-    $("#aggs .data").empty();
+	function updateOwners(response) {
+        ownersRequest = null;
+        updateAgg("#owners", t1, response);
+	}
 
+	function updateSigterms(response) {
+        sigtermsRequest = null;
+        updateAgg("#sigterms", t1, response);
+	}
 
-	docsRequest = $.ajax({
-		url: BASE + "/api/owners/docs?" + query,
+	function updateTopterms(response) {
+        toptermsRequest = null;
+        updateAgg("#topterms", t1, response);
+	}
+
+    _abortRequest(ownersRequest);
+    _abortRequest(sigtermsRequest);
+    _abortRequest(toptermsRequest);
+
+    var queryString = _getQueryString();
+    document.location.hash = queryString;
+
+    _updateAgg("#owners", BASE + "/api/owners?" + queryString);
+	ownersRequest = $.ajax({
+		url: BASE + "/api/owners?" + queryString,
 		type: "GET",
 		dataType : "json",
-		success: updateDocs,
+		success: updateOwners,
 		error: function (response) {
 // 			console.log(response.statusText);
-			$("#docs .stats").empty();
-			$("#docs .data").empty();
+            _resetAgg("#owners");
 		}
 	});
 
-	aggsRequest = $.ajax({
-		url: BASE + "/api/owners/aggs?" + query,
+    _updateAgg("#sigterms", BASE + "/api/sigterms?" + queryString);
+	sigtermsRequest = $.ajax({
+		url: BASE + "/api/sigterms?" + queryString,
 		type: "GET",
 		dataType : "json",
-		success: updateAggs,
+		success: updateSigterms,
 		error: function (response) {
 // 			console.log(response.statusText);
-			$("#aggs .stats").empty();
-			$("#aggs .data").empty();
+            _resetAgg("#sigterms");
+		}
+	});
+
+    _updateAgg("#topterms", BASE + "/api/topterms?" + queryString);
+	toptermsRequest = $.ajax({
+		url: BASE + "/api/topterms?" + queryString,
+		type: "GET",
+		dataType : "json",
+		success: updateTopterms,
+		error: function (response) {
+// 			console.log(response.statusText);
+            _resetAgg("#topterms");
 		}
 	});
 
 }
 
-function _date(d) {
-    if ((d === "1970-01-01") || (d === "2100-01-01")) {
-        d = "unknown   ";
-    }
-    return d;
-}
-
-function _names(record) {
-    var names = [];
-    $.each(record['owner']['names'], function(idx, n) {
-        names.push(n);
-    });
-    return names.join("; ");
-}
-
-function _ids(record) {
-    var ids = [];
-    $.each(record['patent']['ids'], function(idx, i) {
-        if ((i['type'] == 'PUB') || (i['type'] == 'PAT')) {
-            ids.push(i['type'] + ":&nbsp;<a href='https://www.google.com/patents/US" + i['number'] + "'>" + i['number'] + "</a>");
-        }
-        else {
-            ids.push(i['type'] + ":&nbsp;" + i['number']);
-        }
-    });
-    return ids.join(" ");
-}
 
 SPACES = new RegExp("[^A-Za-z0-9_\-]+", "g");
 function _clean(s) {
@@ -195,16 +156,11 @@ function _decode(s) {
     return params
 }
 
-function ignore(event) {
-	if(event.keyCode == 13){
-		event.preventDefault();
-	}
-}
 
 var BASE = "http://" + (document.domain || "localhost:8080");
-// var BASE = "http://patentpit.com";
-var docsRequest = null;
-var aggsRequest = null;
+var ownersRequest = null;
+var sigtermsRequest = null;
+var toptermsRequest = null;
 
 $( document ).ready(function() {
 
@@ -216,7 +172,9 @@ $( document ).ready(function() {
 	$("#searchform").on("keyup", process);
 	$("#searchform").on("submit", process);
 
-	process();
+    if (document.location.hash != "") {
+	    process();
+	}
 
 });
 

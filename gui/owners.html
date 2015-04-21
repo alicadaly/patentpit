@@ -16,7 +16,7 @@
         <div id="search">
         <form id="searchform" autocomplete="off">
             <div class="search">
-                <label for="search_title">TITLE</label>
+                <label for="search_title">TITLE / KEYWORDS</label>
                 <input type="text" id="search_title" autocomplete="off" autofocus="on"></input>
             </div>
             <div class="search">
@@ -32,13 +32,30 @@
         <div style="clear:both;"></div>
         </div>
 
-        <div id="aggs" class="results">
-            <div class="stats"></div>
+        <div id="owners" class="results">
+            <div class="info">
+                <div class="title">OWNERS OF MATCHING PATENTS</div>
+                <div class="url"></div>
+                <div class="stats"></div>
+            </div>
             <div class="data"></div>
         </div>
 
-        <div id="docs" class="results">
-            <div class="stats"></div>
+        <div id="sigterms" class="results">
+            <div class="info">
+                <div class="title">SIGNIFICANT TERMS IN MATCHING PATENTS</div>
+                <div class="url"></div>
+                <div class="stats"></div>
+            </div>
+            <div class="data"></div>
+        </div>
+
+        <div id="topterms" class="results">
+            <div class="info">
+                <div class="title">TOP COMMON TERMS IN MATCHING PATENTS</div>
+                <div class="url"></div>
+                <div class="stats"></div>
+            </div>
             <div class="data"></div>
         </div>
 
