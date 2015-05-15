@@ -14,47 +14,57 @@
  -->
 
         <div id="search">
-        <form id="searchform" autocomplete="off">
+        <form id="search_form" autocomplete="off">
+            <div class="search">
+                <label for="search_owner">OWNER/S</label>
+                <input class="big" type="text" id="search_owner" autocomplete="off" autofocus="on"></input>
+            </div>
             <div class="search">
                 <label for="search_title">TITLE / KEYWORDS</label>
-                <input type="text" id="search_title" autocomplete="off" autofocus="on"></input>
+                <input class="big" type="text" id="search_title" autocomplete="off" autofocus="on"></input>
             </div>
             <div class="search">
-                <label for="search_owners">OWNER/S</label>
-                <input type="text" id="search_owners" autocomplete="off" autofocus="on"></input>
+                <label for="search_date_from">DATE FROM</label>
+                <input class="small" type="text" id="search_date_from" autocomplete="off" autofocus="on"></input>
             </div>
             <div class="search">
-                <label for="search_date">OWNERSHIP PERIOD</label>
-                <input type="text" id="search_dates" autocomplete="off" autofocus="on"></input>
+                <label for="search_date_to">DATE TO</label>
+                <input class="small" type="text" id="search_date_to" autocomplete="off" autofocus="on"></input>
             </div>
         </form>
         <!-- this is a hack to get the form box to size height correctly -->
         <div style="clear:both;"></div>
         </div>
 
-        <div id="owners" class="results">
+        <div id="top_owners" class="results">
             <div class="info">
                 <div class="title">OWNERS OF MATCHING PATENTS</div>
                 <div class="url"></div>
+                <div class="status"></div>
                 <div class="stats"></div>
+                <div class="error"></div>
             </div>
             <div class="data"></div>
         </div>
 
-        <div id="sigterms" class="results">
+        <div id="sig_titles" class="results">
             <div class="info">
                 <div class="title">SIGNIFICANT TERMS IN MATCHING PATENTS</div>
                 <div class="url"></div>
+                <div class="status"></div>
                 <div class="stats"></div>
+				<div class="error"></div>
             </div>
             <div class="data"></div>
         </div>
 
-        <div id="topterms" class="results">
+        <div id="top_titles" class="results">
             <div class="info">
                 <div class="title">TOP COMMON TERMS IN MATCHING PATENTS</div>
                 <div class="url"></div>
+                <div class="status"></div>
                 <div class="stats"></div>
+				<div class="error"></div>
             </div>
             <div class="data"></div>
         </div>

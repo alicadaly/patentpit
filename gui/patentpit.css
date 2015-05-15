@@ -55,9 +55,9 @@ input {
 	background-color: white;
 	border: 1px solid black;
 	margin: 0em;
-	margin-bottom: 10px;
+/*	margin-bottom: 10px; */
 	padding: 10px;
-	width: 300px;
+/*	width: 300px; */
 	display: block;
 }
 
@@ -69,8 +69,16 @@ label {
     display: inline;
     float: left;
     margin: 5px;
+    margin-bottom: 10px;
 }
 
+.big {
+	width: 280px;
+}
+
+.small {
+	width: 150px;
+}
 /* ------------------------------------------------------------------------------------ */
 
 .results {
@@ -88,6 +96,10 @@ label {
 .url {}
 
 .stats {}
+
+.error {
+	color: red;
+}
 
 .title {}
 
@@ -113,9 +125,11 @@ label {
     padding-left: 5px;
 }
 
+/*
 .agg-text em {
-    background-color: rgba(255,255,0,0.2);
+    background-color: rgba(255,255,0,0.5);
 }
+ */
 
 .agg-value {
     position: absolute;

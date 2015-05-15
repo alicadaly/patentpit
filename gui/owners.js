@@ -1,26 +1,26 @@
-function updateAgg(id, t1, response) {
+function aggSuccess(id, t1, response) {
 
-    $(id + " .stats").text("PATENT COUNT: " + response['count'] + " SEARCH TIME: " + response['time_search_ms'] + "ms TOTAL REQUEST TIME: " + (new Date().getTime() - t1) + "ms");
-    $(id + " .title").show()
+	$(id + " .status").hide()
+
+	var stats = $(id + " .stats")
+    stats.text("PATENT COUNT: " + response['count'] + " SEARCH TIME: " + response['time_search_ms'] + "ms TOTAL REQUEST TIME: " + (new Date().getTime() - t1) + "ms");
+	stats.show();
 
     var data = $(id + " .data");
     data.empty();
-
     $.each(response['data'], function(idx, r) {
-        var s = "<div class='agg-item'><div class='agg-value'></div><div class='agg-text'>" + r['key'] + ": " + r['doc_count'] + "</div></div>";
-//         data.append(_highlight(s));
+        var s = "<div class='agg-item'><div class='agg-value'></div><div class='agg-text'>" + r['key'].toUpperCase() + ": " + r['count'] + "</div></div>";
         data.append(s);
     });
+    data.show();
 
     var _d = [];
     $.each(response['data'], function(idx, r) {
-        _d.push(r['doc_count']);
+        _d.push(r['count']);
     });
     var _width = d3.scale.linear()
         .domain([0, d3.max(_d)])
-        .range([0, 985]);
-
-    console.log(_d);
+        .range([0, 975]);
 
     d3.selectAll(id + " .agg-value")
         .data(_d)
@@ -30,114 +30,71 @@ function updateAgg(id, t1, response) {
 
 }
 
+function aggError(id, response, error) {
+
+	$(id + " .status").hide();
+
+	var s = "";
+	if (response.responseText == undefined) {
+		if (response.state() == "rejected") {
+			s = "can't connect to the server";
+		}
+		else {
+			s = "unknown request error";
+		}
+	}
+	else {
+		s = $.parseJSON(response.responseText)["error"];
+	}
+
+	$(id + " .error").text("error: " + s).show();
+}
+
+
 function _abortRequest(r) {
     if (r != null) {
         r.abort();
-        r = null;
         console.log("aborted: " + r);
+        r = null;
     }
 }
 
-function _getQueryString() {
+
+function _buildQueryString() {
     var params = {
         "title": _clean($("#search_title").val()),
-        "owners": _clean($("#search_owners").val()),
-        "dates": _clean($("#search_dates").val()),
+        "owner": _clean($("#search_owner").val()),
+		"date_from": _clean($("#search_date_from").val()),
+		"date_to": _clean($("#search_date_to").val()),
     };
-    var s = _encode(params);
+    var s = _encodeParams(params);
     return s;
 }
 
-function _updateAgg(id, url) {
-    $(id + " .url").text("API URL: " + url);
-    $(id + " .stats").text("processing...");
-    $(id + " .data").empty();
-}
 
-function _resetAgg(id) {
-    $(id + " .title").hide();
-    $(id + " .url").empty();
-    $(id + " .stats").empty();
-    $(id + " .data").empty();
-}
-
-function process(event) {
-
-	var t1 = new Date().getTime()
-
-	function updateOwners(response) {
-        ownersRequest = null;
-        updateAgg("#owners", t1, response);
-	}
-
-	function updateSigterms(response) {
-        sigtermsRequest = null;
-        updateAgg("#sigterms", t1, response);
-	}
-
-	function updateTopterms(response) {
-        toptermsRequest = null;
-        updateAgg("#topterms", t1, response);
-	}
-
-    _abortRequest(ownersRequest);
-    _abortRequest(sigtermsRequest);
-    _abortRequest(toptermsRequest);
-
-    var queryString = _getQueryString();
-    document.location.hash = queryString;
-
-    _updateAgg("#owners", BASE + "/api/owners?" + queryString);
-	ownersRequest = $.ajax({
-		url: BASE + "/api/owners?" + queryString,
-		type: "GET",
-		dataType : "json",
-		success: updateOwners,
-		error: function (response) {
-// 			console.log(response.statusText);
-            _resetAgg("#owners");
-		}
-	});
-
-    _updateAgg("#sigterms", BASE + "/api/sigterms?" + queryString);
-	sigtermsRequest = $.ajax({
-		url: BASE + "/api/sigterms?" + queryString,
-		type: "GET",
-		dataType : "json",
-		success: updateSigterms,
-		error: function (response) {
-// 			console.log(response.statusText);
-            _resetAgg("#sigterms");
-		}
-	});
-
-    _updateAgg("#topterms", BASE + "/api/topterms?" + queryString);
-	toptermsRequest = $.ajax({
-		url: BASE + "/api/topterms?" + queryString,
-		type: "GET",
-		dataType : "json",
-		success: updateTopterms,
-		error: function (response) {
-// 			console.log(response.statusText);
-            _resetAgg("#topterms");
-		}
-	});
-
-}
-
-
-SPACES = new RegExp("[^A-Za-z0-9_\-]+", "g");
 function _clean(s) {
-    s = s
-        .replace(SPACES, " ")
+	var r = new RegExp("[^A-Za-z0-9_\-]+", "g");
+    return s
+		.replace(r, " ")
         .trim()
         .split(" ")
         .join(",")
         .toLowerCase();
-    return s;
 }
 
-function _encode(p) {
+
+function aggProcessing(id, url) {
+    $(id + " .title").show();
+    $(id + " .url").text("API URL: " + url).show();
+    $(id + " .stats").empty().show();
+    $(id + " .status").text("processing...").show();
+    $(id + " .error").empty().hide();
+    $(id + " .data").empty().hide();
+    $(id).show();
+}
+
+
+function _encodeParams(p) {
     var s = "";
     $.each(p, function(k, v) {
         s += k + "=" + v + "&";
@@ -145,7 +102,8 @@ function _encode(p) {
     return s.slice(0,-1)
 }
 
-function _decode(s) {
+
+function _decodeParams(s) {
     var params = {}
     $.each(s.split("&"), function(_, v) {
         kv = v.split("=");
@@ -157,20 +115,73 @@ function _decode(s) {
 }
 
 
+function process(event) {
+
+	var t1 = new Date().getTime()
+
+
+    _abortRequest(topOwnersRequest);
+    _abortRequest(sigTitlesRequest);
+    _abortRequest(topTitlesRequest);
+
+    var queryString = _buildQueryString();
+    document.location.hash = queryString;
+
+	var url;
+
+	url = BASE + "/api/topowners?" + queryString;
+    aggProcessing("#top_owners", url);
+	topOwnersRequest = $.ajax({
+		url: url,
+		type: "GET",
+		dataType : "json",
+		success: function(response){ aggSuccess("#top_owners", t1, response); },
+		error: function(response, error){ aggError("#top_owners", response, error); },
+	});
+
+	url = BASE + "/api/sigtitles?" + queryString;
+    aggProcessing("#sig_titles", url);
+	sigTitlesRequest = $.ajax({
+		url: url,
+		type: "GET",
+		dataType : "json",
+		success: function(response){ aggSuccess("#sig_titles", t1, response); },
+		error: function(response, error){ aggError("#sig_titles", response, error); },
+	});
+
+	url = BASE + "/api/toptitles?" + queryString;
+    aggProcessing("#top_titles", url);
+	topTitlesRequest = $.ajax({
+		url: url,
+		type: "GET",
+		timeout: 100,
+		dataType : "json",
+		success: function(response){ aggSuccess("#top_titles", t1, response); },
+		error: function(response, error){ aggError("#top_titles", response, error); },
+	});
+
+}
+
+
 var BASE = "http://" + (document.domain || "localhost:8080");
-var ownersRequest = null;
-var sigtermsRequest = null;
-var toptermsRequest = null;
+var topOwnersRequest = null;
+var sigTitlesRequest = null;
+var topTitlesRequest = null;
 
 $( document ).ready(function() {
 
-    var params = _decode(document.location.hash.slice(1).replace(",", " "));
-    $("#search_title").val(params['title'])
-    $("#search_owners").val(params['owners'])
-    $("#search_dates").val(params['dates'])
+	$("#top_owners").hide();
+	$("#sig_titles").hide();
+	$("#top_titles").hide();
 
-	$("#searchform").on("keyup", process);
-	$("#searchform").on("submit", process);
+    var params = _decodeParams(document.location.hash.slice(1).replace(",", " "));
+    $("#search_title").val(params['title']);
+    $("#search_owner").val(params['owner']);
+    $("#search_date_from").val(params['date_from']);
+    $("#search_date_to").val(params['date_to']);
+
+	$("#search_form").on("keyup", process);
+	$("#search_form").on("submit", process);
 
     if (document.location.hash != "") {
 	    process();
