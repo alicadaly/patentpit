@@ -1,3 +1,32 @@
+function docsSuccess(id, t1, response) {
+
+	$(id + " .status").hide()
+
+	var stats = $(id + " .stats")
+    stats.text("PATENT COUNT: " + response['count'] + " SEARCH TIME: " + response['time_search_ms'] + "ms TOTAL REQUEST TIME: " + (new Date().getTime() - t1) + "ms");
+	stats.show();
+
+    var data = $(id + " .data");
+    data.empty();
+    $.each(response['data'], function(idx, r) {
+    	console.log(r);
+        var s = "<div class='docs-item'>" + getPatId(r) + ": " + trim(r['source']['patent']['titles'][0]['title'].toUpperCase(), 90) + "</div>";
+        data.append(s);
+    });
+    data.show();
+
+    return;
+
+}
+
+function getPatId(s) {
+
+	var i = s['source']['patent']['ids'][0];
+	var d = i['number'];
+
+	return d;
+}
+
 function aggSuccess(id, t1, response) {
 
 	$(id + " .status").hide()
@@ -9,7 +38,7 @@ function aggSuccess(id, t1, response) {
     var data = $(id + " .data");
     data.empty();
     $.each(response['data'], function(idx, r) {
-        var s = "<div class='agg-item'><div class='agg-value'></div><div class='agg-text'>" + r['key'].toUpperCase() + ": " + r['count'] + "</div></div>";
+        var s = "<div class='aggs-item'><div class='agg-value'></div><div class='agg-text'>" + r['key'].toUpperCase() + ": " + r['count'] + "</div></div>";
         data.append(s);
     });
     data.show();
@@ -30,7 +59,7 @@ function aggSuccess(id, t1, response) {
 
 }
 
-function aggError(id, response, error) {
+function reqError(id, response, error) {
 
 	$(id + " .status").hide();
 
@@ -83,7 +112,22 @@ function _clean(s) {
 }
 
 
-function aggProcessing(id, url) {
+function trim(s, max) {
+
+	var trimmed = "";
+	$.each(s.split(" "), function(idx, r) {
+		if ((trimmed + " " + r).length < max) {
+			trimmed = trimmed + " " + r;
+		}
+    });
+
+	if (trimmed.length < s.length) {
+		trimmed = trimmed + " ...";
+	}
+    return trimmed;
+}
+
+function processing(id, url) {
     $(id + " .title").show();
     $(id + " .url").text("API URL: " + url).show();
     $(id + " .stats").empty().show();
@@ -129,36 +173,46 @@ function process(event) {
 
 	var url;
 
-	url = BASE + "/api/topowners?" + queryString;
-    aggProcessing("#top_owners", url);
+	url = BASE + "/api/uspto/patent/owners/topowners?" + queryString;
+    processing("#top_owners", url);
 	topOwnersRequest = $.ajax({
 		url: url,
 		type: "GET",
 		dataType : "json",
 		success: function(response){ aggSuccess("#top_owners", t1, response); },
-		error: function(response, error){ aggError("#top_owners", response, error); },
+		error: function(response, error){ reqError("#top_owners", response, error); },
 	});
 
-	url = BASE + "/api/sigtitles?" + queryString;
-    aggProcessing("#sig_titles", url);
+	url = BASE + "/api/uspto/patent/owners/sigtitles?" + queryString;
+    processing("#sig_titles", url);
 	sigTitlesRequest = $.ajax({
 		url: url,
 		type: "GET",
 		dataType : "json",
 		success: function(response){ aggSuccess("#sig_titles", t1, response); },
-		error: function(response, error){ aggError("#sig_titles", response, error); },
+		error: function(response, error){ reqError("#sig_titles", response, error); },
 	});
 
-	url = BASE + "/api/toptitles?" + queryString;
-    aggProcessing("#top_titles", url);
+	url = BASE + "/api/uspto/patent/owners/toptitles?" + queryString;
+    processing("#top_titles", url);
 	topTitlesRequest = $.ajax({
 		url: url,
 		type: "GET",
-		timeout: 100,
 		dataType : "json",
 		success: function(response){ aggSuccess("#top_titles", t1, response); },
-		error: function(response, error){ aggError("#top_titles", response, error); },
+		error: function(response, error){ reqError("#top_titles", response, error); },
 	});
+
+	url = BASE + "/api/uspto/patent/owners?" + queryString;
+    processing("#docs", url);
+	docsRequest = $.ajax({
+		url: url,
+		type: "GET",
+		dataType : "json",
+		success: function(response){ docsSuccess("#docs", t1, response); },
+		error: function(response, error){ reqError("#docs", response, error); },
+	});
+
 
 }
 
@@ -167,12 +221,14 @@ var BASE = "http://" + (document.domain || "localhost:8080");
 var topOwnersRequest = null;
 var sigTitlesRequest = null;
 var topTitlesRequest = null;
+var docsRequest = null;
 
 $( document ).ready(function() {
 
 	$("#top_owners").hide();
 	$("#sig_titles").hide();
 	$("#top_titles").hide();
+	$("#docs").hide();
 
     var params = _decodeParams(document.location.hash.slice(1).replace(",", " "));
     $("#search_title").val(params['title']);
