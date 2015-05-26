@@ -129,7 +129,7 @@ function trim(s, max) {
 
 function processing(id, url) {
     $(id + " .title").show();
-    $(id + " .url").text("API URL: " + url).show();
+    $(id + " .url").html("API URL: <a href='" + url + "'>" + url + "</a>").show();
     $(id + " .stats").empty().show();
     $(id + " .status").text("processing...").show();
     $(id + " .error").empty().hide();
@@ -166,14 +166,14 @@ function process(event) {
 
     _abortRequest(topOwnersRequest);
     _abortRequest(sigTitlesRequest);
-    _abortRequest(topTitlesRequest);
+//     _abortRequest(topTitlesRequest);
 
     var queryString = _buildQueryString();
     document.location.hash = queryString;
 
 	var url;
 
-	url = BASE + "/api/uspto/patent/owners/topowners?" + queryString;
+	url = BASE + "/api/uspto/patents/owners/topowners?" + queryString;
     processing("#top_owners", url);
 	topOwnersRequest = $.ajax({
 		url: url,
@@ -183,7 +183,7 @@ function process(event) {
 		error: function(response, error){ reqError("#top_owners", response, error); },
 	});
 
-	url = BASE + "/api/uspto/patent/owners/sigtitles?" + queryString;
+	url = BASE + "/api/uspto/patents/owners/sigtitles?" + queryString;
     processing("#sig_titles", url);
 	sigTitlesRequest = $.ajax({
 		url: url,
@@ -193,17 +193,17 @@ function process(event) {
 		error: function(response, error){ reqError("#sig_titles", response, error); },
 	});
 
-	url = BASE + "/api/uspto/patent/owners/toptitles?" + queryString;
-    processing("#top_titles", url);
-	topTitlesRequest = $.ajax({
-		url: url,
-		type: "GET",
-		dataType : "json",
-		success: function(response){ aggSuccess("#top_titles", t1, response); },
-		error: function(response, error){ reqError("#top_titles", response, error); },
-	});
+// 	url = BASE + "/api/uspto/patents/owners/toptitles?" + queryString;
+//  processing("#top_titles", url);
+// 	topTitlesRequest = $.ajax({
+// 		url: url,
+// 		type: "GET",
+// 		dataType : "json",
+// 		success: function(response){ aggSuccess("#top_titles", t1, response); },
+// 		error: function(response, error){ reqError("#top_titles", response, error); },
+// 	});
 
-	url = BASE + "/api/uspto/patent/owners?" + queryString;
+	url = BASE + "/api/uspto/patents/owners?" + queryString;
     processing("#docs", url);
 	docsRequest = $.ajax({
 		url: url,
@@ -220,14 +220,14 @@ function process(event) {
 var BASE = "http://" + (document.domain || "localhost:8080");
 var topOwnersRequest = null;
 var sigTitlesRequest = null;
-var topTitlesRequest = null;
+// var topTitlesRequest = null;
 var docsRequest = null;
 
 $( document ).ready(function() {
 
 	$("#top_owners").hide();
 	$("#sig_titles").hide();
-	$("#top_titles").hide();
+// 	$("#top_titles").hide();
 	$("#docs").hide();
 
     var params = _decodeParams(document.location.hash.slice(1).replace(",", " "));
