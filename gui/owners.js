@@ -95,6 +95,7 @@ function _buildQueryString() {
         "owner": _clean($("#search_owner").val()),
 		"date_from": _clean($("#search_date_from").val()),
 		"date_to": _clean($("#search_date_to").val()),
+		"size": 10,
     };
     var s = _encodeParams(params);
     return s;
