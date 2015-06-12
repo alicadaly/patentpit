@@ -9,8 +9,10 @@ function docsSuccess(id, t1, response) {
     var data = $(id + " .data");
     data.empty();
     $.each(response['data'], function(idx, r) {
-    	console.log(r);
-        var s = "<div class='docs-item'>" + getPatId(r) + ": " + trim(r['source']['patent']['titles'][0]['title'].toUpperCase(), 90) + "</div>";
+    	//console.log(r);
+    	var url = response.url.split("?")[0];
+    	console.log(url);
+        var s = "<div class='docs-item'><a href='" + BASE + url + "?number=" + getPatId(r) + "'>" + getPatId(r) + ": " + trim(r['source']['patent']['titles'][0]['title'].toUpperCase(), 85) + "</a></div>";
         data.append(s);
     });
     data.show();
@@ -38,7 +40,7 @@ function aggSuccess(id, t1, response) {
     var data = $(id + " .data");
     data.empty();
     $.each(response['data'], function(idx, r) {
-        var s = "<div class='aggs-item'><div class='agg-value'></div><div class='agg-text'>" + r['key'].toUpperCase() + ": " + r['count'] + "</div></div>";
+        var s = "<div class='aggs-item'><div class='agg-value'></div><div class='agg-text'>" + trim(r['key'].toUpperCase(), 85) + ": " + r['count'] + "</div></div>";
         data.append(s);
     });
     data.show();
