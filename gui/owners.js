@@ -95,8 +95,7 @@ function _buildQueryString() {
     var params = {
         "title": _clean($("#search_title").val()),
         "owner": _clean($("#search_owner").val()),
-		"date_from": _clean($("#search_date_from").val()),
-		"date_to": _clean($("#search_date_to").val()),
+		"date": _clean($("#search_date").val()),
 		"size": 10,
     };
     var s = _encodeParams(params);
@@ -130,9 +129,9 @@ function trim(s, max) {
     return trimmed;
 }
 
-function processing(id, url) {
+function processing(id, url, urlText) {
     $(id + " .title").show();
-    $(id + " .url").html("API URL: <a href='" + url + "'>" + url + "</a>").show();
+    $(id + " .url").html("API CALL: <a href='" + url + "'>" + urlText + "</a>").show();
     $(id + " .stats").empty().show();
     $(id + " .status").text("processing...").show();
     $(id + " .error").empty().hide();
@@ -177,7 +176,7 @@ function process(event) {
 	var url;
 
 	url = BASE + "/api/uspto/patents/owners/topowners?" + queryString;
-    processing("#top_owners", url);
+    processing("#top_owners", url, "/topowners?" + queryString);
 	topOwnersRequest = $.ajax({
 		url: url,
 		type: "GET",
@@ -187,7 +186,7 @@ function process(event) {
 	});
 
 	url = BASE + "/api/uspto/patents/owners/sigtitles?" + queryString;
-    processing("#sig_titles", url);
+    processing("#sig_titles", url, "/sigtitles?" + queryString);
 	sigTitlesRequest = $.ajax({
 		url: url,
 		type: "GET",
@@ -207,7 +206,7 @@ function process(event) {
 // 	});
 
 	url = BASE + "/api/uspto/patents/owners?" + queryString;
-    processing("#docs", url);
+    processing("#docs", url, "/owners?" + queryString);
 	docsRequest = $.ajax({
 		url: url,
 		type: "GET",
@@ -236,8 +235,7 @@ $( document ).ready(function() {
     var params = _decodeParams(document.location.hash.slice(1).replace(",", " "));
     $("#search_title").val(params['title']);
     $("#search_owner").val(params['owner']);
-    $("#search_date_from").val(params['date_from']);
-    $("#search_date_to").val(params['date_to']);
+    $("#search_date").val(params['date']);
 
 	$("#search_form").on("keyup", process);
 	$("#search_form").on("submit", process);
