@@ -1,17 +1,19 @@
 body {
 	font-family: Courier, monospace;
-	font-size: 100%;
 	color: black;
 	background-color: white;
 	margin: 0em;
 	padding: 3em;
 	padding-top: 1em;
+	width: 810px;
 }
 
 div {
 	padding: 0px;
 	margin: 0;
+/*
 	border: 1px solid black;
+ */
 	border: none;
 }
 
@@ -28,22 +30,21 @@ a {
 	font-style: normal;
 	font-weight: normal;
 	color: black;
-/* 	background-color: PaleGoldenRod; */
-/* 	background-color: bisque; */
-/*  background-color: rgba(255,223,181,0.5); */
 	padding-left: 5px;
 	padding-right: 5px;
 }
 
 a:hover {
-/*
-	background-color: PaleGoldenRod;
- */
  	background-color: lightblue;
     text-decoration: none;
 }
 
 /* ------------------------------------------------------------------------------------ */
+
+#about {
+	font-size: 80%;
+	color: grey;
+}
 
 form {
 	padding: 0em;
@@ -58,7 +59,6 @@ input {
 	background-color: white;
 	border: 1px solid black;
 	margin: 0em;
-/*	margin-bottom: 10px; */
 	padding: 10px;
 /*	width: 300px; */
 	display: block;
@@ -69,17 +69,23 @@ label {
 }
 
 .search {
+/*
+	border: 1px solid black;
+ */
+}
+
+.search_input {
     display: inline;
     float: left;
     margin: 5px;
     margin-bottom: 10px;
 }
 
-.big {
+.search_input_big {
 	width: 280px;
 }
 
-.small {
+.search_input_small {
 	width: 150px;
 }
 /* ------------------------------------------------------------------------------------ */
@@ -88,7 +94,12 @@ label {
     height: auto;
     padding: 5px;
     margin-bottom: 15px;
+/*
     width: 985px;
+ */
+/*
+    border: 1px solid black;
+ */
 }
 
 .info {
@@ -114,14 +125,17 @@ label {
 .detail {
     color: grey;
     font-size: 85%;
-/*     white-space: pre; */
-/*     border: 1px solid red; */
 }
 
 .docs-item {
     position: relative;
     margin-top: 2px;
     margin-bottom: 2px;
+/*
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+ */
 }
 
 .aggs-item {
@@ -132,24 +146,18 @@ label {
 
 .agg-text {
     padding-left: 5px;
-}
-
 /*
-.agg-text em {
-    background-color: rgba(255,255,0,0.5);
-}
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
  */
+}
 
 .agg-value {
     position: absolute;
     top: 0px;
     left: 0px;
     height: 100%;
-/*     background-color: powderblue; */
-/*     background-color: aliceblue; */
     background-color: darkseagreen;
-/*     background-color: lavender; */
-/*     background-color: #dddddd; */
-/*     background-color: rgba(125,178,123,0.7); */
     z-index: -1;
 }

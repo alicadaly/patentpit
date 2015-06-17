@@ -9,19 +9,25 @@
 
 	<div>
 
-        <div id="search">
+<!--
+		<div id="about">
+		The purpose of this API is to answer who owned what patents when. The two primary use cases are: 'give me all the patents that Apple owned in 2012' and 'give me all the owners for patents on mobile devices'. In addition to retrieving raw documents, there are API endpoints for analyzing the data.
+		</div>
+ -->
+
+        <div class="search">
 			<form id="search_form" autocomplete="off">
-				<div class="search">
+				<div class="search_input">
 					<label for="search_owner">OWNER/S</label>
-					<input class="big" type="text" id="search_owner" autocomplete="off" autofocus="on"></input>
+					<input class="search_input_big" type="text" id="search_owner" autocomplete="off" autofocus="on"></input>
 				</div>
-				<div class="search">
+				<div class="search_input">
 					<label for="search_title">TITLE / KEYWORDS</label>
-					<input class="big" type="text" id="search_title" autocomplete="off" autofocus="on"></input>
+					<input class="search_input_big" type="text" id="search_title" autocomplete="off" autofocus="on"></input>
 				</div>
-				<div class="search">
+				<div class="search_input">
 					<label for="search_date">DATE</label>
-					<input class="small" type="text" id="search_date" autocomplete="off" autofocus="on"></input>
+					<input class="search_input_small" type="text" id="search_date" autocomplete="off" autofocus="on"></input>
 				</div>
 			</form>
 			<!-- this is a hack to get the form box to size height correctly -->
@@ -49,19 +55,6 @@
             </div>
             <div class="data"></div>
         </div>
-
-<!--
-        <div id="top_titles" class="results">
-            <div class="info">
-                <div class="title">TOP COMMON TERMS IN MATCHING PATENTS</div>
-                <div class="url"></div>
-                <div class="status"></div>
-                <div class="stats"></div>
-				<div class="error"></div>
-            </div>
-            <div class="data"></div>
-        </div>
- -->
 
         <div id="docs" class="results">
             <div class="info">

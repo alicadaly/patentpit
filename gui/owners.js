@@ -11,8 +11,12 @@ function docsSuccess(id, t1, response) {
     $.each(response['data'], function(idx, r) {
     	//console.log(r);
     	var url = response.url.split("?")[0];
-    	console.log(url);
-        var s = "<div class='docs-item'><a href='" + BASE + url + "?number=" + getPatId(r) + "'>" + getPatId(r) + ": " + trim(r['source']['patent']['titles'][0]['title'].toUpperCase(), 85) + "</a></div>";
+//     	console.log(url);
+		var title = "NO TITLE";
+		if (r['source']['patent']['titles'].length > 0) {
+			title = r['source']['patent']['titles'][0]['title'].toUpperCase();
+		}
+        var s = "<div class='docs-item'><a href='" + BASE + url + "?number=" + getPatId(r) + "'>" + getPatId(r) + ": " + trim(title) + "</a></div>";
         data.append(s);
     });
     data.show();
@@ -40,7 +44,7 @@ function aggSuccess(id, t1, response) {
     var data = $(id + " .data");
     data.empty();
     $.each(response['data'], function(idx, r) {
-        var s = "<div class='aggs-item'><div class='agg-value'></div><div class='agg-text'>" + trim(r['key'].toUpperCase(), 85) + ": " + r['count'] + "</div></div>";
+        var s = "<div class='aggs-item'><div class='agg-value'></div><div class='agg-text'>" + trim(r['key'].toUpperCase()) + ": " + r['count'] + "</div></div>";
         data.append(s);
     });
     data.show();
@@ -51,7 +55,8 @@ function aggSuccess(id, t1, response) {
     });
     var _width = d3.scale.linear()
         .domain([0, d3.max(_d)])
-        .range([0, 975]);
+        .range([0, $(".results").width()-5]);
+//         .range([0, 795]);
 
     d3.selectAll(id + " .agg-value")
         .data(_d)
@@ -115,6 +120,11 @@ function _clean(s) {
 
 
 function trim(s, max) {
+
+	if (typeof max === 'undefined') {
+		var max = $(".results").width() / 12;
+	}
+	console.log(max);
 
 	var trimmed = "";
 	$.each(s.split(" "), function(idx, r) {
